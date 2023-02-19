@@ -146,9 +146,10 @@ app.post('/places', async (req, res) => {
     jwt.verify(token, jwtSecret, {}, async (error, userData) => {
         if (error) throw error;
         const places = await PlaceModel.create({
+            owner: userData.id,
             title,
             address,
-            addPhotos,
+            photos: addPhotos,
             description,
             perks,
             extraInfo,
@@ -159,6 +160,20 @@ app.post('/places', async (req, res) => {
         res.json(places)
     })
 
+})
+
+
+app.get('/places', (req, res) => {
+    const { token } = req.cookies
+    jwt.verify(token, jwtSecret, {}, async (error, userData) => {
+        const { id } = userData
+        res.json(await PlaceModel.find({ owner: id }))
+    })
+})
+
+app.get('/places/:id', async (req, res) => {
+    const { id } = req.params
+    res.json(await PlaceModel.findById(id))
 })
 
 app.listen(4000, console.log('Port 4000'))
