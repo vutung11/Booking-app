@@ -176,4 +176,40 @@ app.get('/places/:id', async (req, res) => {
     res.json(await PlaceModel.findById(id))
 })
 
+app.put('/places', async (req, res) => {
+    const { token } = req.cookies
+    const {
+        id,
+        title,
+        address,
+        addPhotos,
+        description,
+        perks,
+        extraInfo,
+        checkIn,
+        checkOut,
+        maxGuest
+    } = req.body
+    jwt.verify(token, jwtSecret, {}, async (error, userData) => {
+        const place = await PlaceModel.findById(id)
+        if (userData.id === place.owner.toString()) {
+            place.set({
+                title,
+                address,
+                photos: addPhotos,
+                description,
+                perks,
+                extraInfo,
+                checkIn,
+                checkOut,
+                maxGuest
+            })
+            await place.save()
+        }
+        res.json('ok')
+
+    })
+
+})
+
 app.listen(4000, console.log('Port 4000'))

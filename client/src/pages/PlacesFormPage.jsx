@@ -62,10 +62,9 @@ export default function PlacesFormPage() {
         }
     }, [id])
 
-    const addNewPlace = async (ev) => {
+    const savePlace = async (ev) => {
         ev.preventDefault();
-        console.log(addPhotos)
-        await axios.post('/places', {
+        const dataPlace = {
             title,
             address,
             addPhotos,
@@ -75,13 +74,25 @@ export default function PlacesFormPage() {
             checkIn,
             checkOut,
             maxGuest
-        });
+        }
+        console.log(addPhotos)
+        if (id) {
+            axios.put('/places', {
+                id, ...dataPlace
+            })
+
+        } else {
+            await axios.post('/places', {
+                dataPlace
+            });
+        }
+
 
         setRedirect('/account/places')
     }
 
     return <div>
-        <form onSubmit={addNewPlace}>
+        <form onSubmit={savePlace}>
             {preInput('Title', 'Title your place')}
             <input type="text"
                 value={title}
