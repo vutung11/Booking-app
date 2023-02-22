@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import AccountNav from "../AccountNav";
 import PlaceImg from "./PlaceImg";
 
 export default function PlacesPage() {
@@ -13,8 +14,9 @@ export default function PlacesPage() {
     }, [])
 
 
-    return (
-        <div className="mt-4">
+    return <>
+        <AccountNav />
+        <diV>
             <div className="text-center">
                 <Link to={'/account/places/new'} className="inline-flex gap-1 bg-primary text-white py-2 px-6 rounded-full">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
@@ -36,6 +38,6 @@ export default function PlacesPage() {
                     </Link>
                 ))}
             </div>
-        </div>
-    )
+        </diV>
+    </>
 }
