@@ -2,13 +2,12 @@ import { useEffect, useState } from "react";
 import PhotosUploader from './PhotosUploader';
 import Perks from './Perks';
 import axios from "axios";
-import { useLocation, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 export default function PlacesFormPage() {
 
     const { id } = useParams()
 
-    console.log(id)
 
     const [title, setTitle] = useState('')
     const [address, setAddress] = useState('');
@@ -19,6 +18,7 @@ export default function PlacesFormPage() {
     const [checkIn, setCheckIn] = useState('');
     const [checkOut, setCheckOut] = useState('');
     const [maxGuest, setMaxGuest] = useState(1);
+    const [price, setPrice] = useState('')
 
 
     const [redirect, setRedirect] = useState(false)
@@ -47,7 +47,7 @@ export default function PlacesFormPage() {
         if (!id) {
             return;
         } else {
-            axios.get('/places/' + id).then(response => {
+            axios.get('/user-places/' + id).then(response => {
                 const { data } = response;
                 setTitle(data.title);
                 setAddress(data.address);
@@ -58,6 +58,7 @@ export default function PlacesFormPage() {
                 setCheckIn(data.checkIn);
                 setCheckOut(data.checkOut);
                 setMaxGuest(data.maxGuest);
+                setPrice(data.price);
             })
         }
     }, [id])
@@ -73,9 +74,9 @@ export default function PlacesFormPage() {
             extraInfo,
             checkIn,
             checkOut,
-            maxGuest
+            maxGuest,
+            price
         }
-        console.log(addPhotos)
         if (id) {
             axios.put('/places', {
                 id, ...dataPlace
@@ -143,6 +144,13 @@ export default function PlacesFormPage() {
                     <input type="number"
                         value={maxGuest}
                         onChange={ev => setMaxGuest(ev.target.value)}
+                        placeholder="2" />
+                </div>
+                <div>
+                    <h3 className="mt-2 -mb-1">Price</h3>
+                    <input type="number"
+                        value={price}
+                        onChange={ev => setPrice(ev.target.value)}
                         placeholder="2" />
                 </div>
             </div>

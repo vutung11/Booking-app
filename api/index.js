@@ -10,6 +10,7 @@ const fs = require('fs')
 const User = require('./models/User.js')
 const { json } = require('express')
 const PlaceModel = require('./models/Place.js')
+const BookingModel = require('./models/Booking.js')
 
 mongoose.set('strictQuery', true)
 
@@ -40,6 +41,15 @@ mongoose.connect(process.env.MONGO_URL,
     //     console.log('Connect fail', error.message)
     // }
 )
+
+function getUserDataFromReq(req) {
+    return new Promise((resolve, reject) => {
+        jwt.verify(req.cookies.token, jwtSecret, {}, async (err, userData) => {
+            if (err) throw err;
+            resolve(userData);
+        });
+    });
+}
 
 app.get('/test', (req, res) => {
     res.json('test oke')
@@ -140,7 +150,8 @@ app.post('/places', async (req, res) => {
         extraInfo,
         checkIn,
         checkOut,
-        maxGuest
+        maxGuest,
+        price
     } = req.body
 
     jwt.verify(token, jwtSecret, {}, async (error, userData) => {
@@ -155,7 +166,8 @@ app.post('/places', async (req, res) => {
             extraInfo,
             checkIn,
             checkOut,
-            maxGuest
+            maxGuest,
+            price,
         })
         res.json(places)
     })
@@ -163,7 +175,7 @@ app.post('/places', async (req, res) => {
 })
 
 
-app.get('/places', (req, res) => {
+app.get('/user-places', (req, res) => {
     const { token } = req.cookies
     jwt.verify(token, jwtSecret, {}, async (error, userData) => {
         const { id } = userData
@@ -171,7 +183,14 @@ app.get('/places', (req, res) => {
     })
 })
 
-app.get('/places/:id', async (req, res) => {
+app.get('/places', (req, res) => {
+    const { token } = req.cookies
+    jwt.verify(token, jwtSecret, {}, async (error, userData) => {
+        res.json(await PlaceModel.find())
+    })
+})
+
+app.get('/user-places/:id', async (req, res) => {
     const { id } = req.params
     res.json(await PlaceModel.findById(id))
 })
@@ -188,7 +207,8 @@ app.put('/places', async (req, res) => {
         extraInfo,
         checkIn,
         checkOut,
-        maxGuest
+        maxGuest,
+        price
     } = req.body
     jwt.verify(token, jwtSecret, {}, async (error, userData) => {
         const place = await PlaceModel.findById(id)
@@ -202,7 +222,8 @@ app.put('/places', async (req, res) => {
                 extraInfo,
                 checkIn,
                 checkOut,
-                maxGuest
+                maxGuest,
+                price,
             })
             await place.save()
         }
@@ -210,6 +231,29 @@ app.put('/places', async (req, res) => {
 
     })
 
+})
+
+app.get('/place/:id', async (req, res) => {
+    const { id } = req.params
+    res.json(await PlaceModel.findById(id))
+
+})
+app.post('/bookings', async (req, res) => {
+    const userData = await getUserDataFromReq(req);
+    const { place, checkIn, checkOut, name, phone, price } = req.body
+    BookingModel.create({
+        place, checkIn, checkOut, name, phone, price,
+        user: userData.id
+    }).then((doc) => {
+        res.json(doc)
+    }).catch((error) => {
+        throw error;
+    })
+})
+
+app.get('/bookings', async (req, res) => {
+    const userData = await getUserDataFromReq(req)
+    res.json(await BookingModel.find({ user: userData.id }).populate('place'))
 })
 
 app.listen(4000, console.log('Port 4000'))
