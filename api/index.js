@@ -14,6 +14,8 @@ const BookingModel = require('./models/Booking.js')
 
 mongoose.set('strictQuery', true)
 
+const MONGO_URL = 'mongodb+srv://booking:Tung197@cluster0.jhjmij3.mongodb.net/Booking-App?retryWrites=true&w=majority'
+
 require('dotenv').config()
 const app = express()
 
@@ -29,7 +31,7 @@ app.use(cors({
     origin: 'http://127.0.0.1:5173',
 }))
 
-mongoose.connect(process.env.MONGO_URL,
+mongoose.connect(MONGO_URL,
     // {
     //     useNewUrlParser: true,
     //     useUnifiedTopology: true,
