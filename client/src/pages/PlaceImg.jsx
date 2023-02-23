@@ -8,6 +8,6 @@ export default function PlaceImg({ place, index = 0, className = null }) {
     }
 
     return (
-        <img className={className} src={'http://localhost:4000/uploads/' + place.photos[0]} alt="" />
+        <img className={className} src={'https://apibooking-etxj.onrender.com/uploads/' + place.photos[0]} alt="" />
     )
 }

@@ -14,7 +14,7 @@ import BookingPage from './pages/BookingPage';
 
 import './App.css';
 
-axios.defaults.baseURL = 'http://127.0.0.1:4000';
+axios.defaults.baseURL = 'https://apibooking-etxj.onrender.com';
 axios.defaults.withCredentials = true;
 function App() {
 
