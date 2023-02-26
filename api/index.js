@@ -89,7 +89,7 @@ app.post('/login', async (req, res) => {
                 name: user.name,
             }, jwtSecret, {}, (error, token) => {
                 if (error) throw error;
-                res.cookie('token', token).json('passoke')
+                res.cookie('token', token).json(user)
             })
         } else {
             res.status(422).json('password not working')
