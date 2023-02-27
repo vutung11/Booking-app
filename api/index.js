@@ -76,27 +76,28 @@ app.post('/register', async (req, res) => {
 })
 
 app.post('/login', async (req, res) => {
-    const { email, password } = req.body
-
-    const user = await User.findOne({ email })
-
-    if (user) {
-        const passOk = bcrypt.compareSync(password, user.password)
+    const { email, password } = req.body;
+    const userDoc = await User.findOne({ email });
+    if (userDoc) {
+        const passOk = bcrypt.compareSync(password, userDoc.password);
         if (passOk) {
             jwt.sign({
-                email: user.email,
-                id: user._id,
-            }, jwtSecret, {}, (error, token) => {
-                if (error) throw error;
-                res.cookie('token', token).json(user)
-            })
+                email: userDoc.email,
+                id: userDoc._id
+            }, jwtSecret, {}, (err, token) => {
+                if (err) throw err;
+                res.cookie('token', token, {
+                    sameSite: 'none',
+                    secure: true
+                }).json(userDoc);
+            });
         } else {
-            res.status(422).json('password not working')
+            res.status(422).json('pass not ok');
         }
     } else {
-        res.json('not found')
+        res.json('not found');
     }
-})
+});
 
 app.get('/profile', (req, res) => {
     const { token } = req.cookies;
@@ -176,13 +177,21 @@ app.post('/places', async (req, res) => {
 })
 
 
+// app.get('/user-places', (req, res) => {
+//     const { token } = req.cookies
+//     // jwt.verify(token, jwtSecret, {}, async (error, userData) => {
+//     //     const { id } = userData
+//     //     res.json(await PlaceModel.find({ owner: id }))
+//     // })
+// })
+
 app.get('/user-places', (req, res) => {
-    const { token } = req.cookies
-    jwt.verify(token, jwtSecret, {}, async (error, userData) => {
-        const { id } = userData
-        res.json(await PlaceModel.find({ owner: id }))
-    })
-})
+    const { token } = req.cookies;
+    jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+        const { id } = userData;
+        res.json(await PlaceModel.find({ owner: id }));
+    });
+});
 
 app.get('/places', (req, res) => {
     const { token } = req.cookies
